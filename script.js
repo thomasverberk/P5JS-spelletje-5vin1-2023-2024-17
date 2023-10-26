@@ -1,3 +1,24 @@
+var bommenArray = [];
+
+class Bom {
+constructor() {
+  this.x = floor(random(1,raster.aantalKolommen))*raster.celGrootte;
+  this.y = floor(random(0,raster.aantalRijen))*raster.celGrootte;
+}
+  toon() {
+      image(bomPlaatje,this.x,this.y,raster.celGrootte,raster.celGrootte);
+    }
+  }
+
+class Appel {
+  constructor() {
+    this.x = floor(random(1, Raster.aantalKolommen - 1)) * Raster.celGrootte;
+    this.y = floor(random(1, Raster.aantalRijen - 1)) * Raster.celGrootte;
+    this.sprite = loadImage("images/apple.png"); 
+    
+  }
+}
+
 class Raster {
   constructor(r,k) {
     this.aantalRijen = r;
@@ -24,12 +45,13 @@ class Raster {
 
 class Jos {
   constructor() {
-    this.x = 400;
-    this.y = 300;
+    this.x = 0;
+    this.y = 200;
     this.animatie = [];
     this.frameNummer =  3;
     this.stapGrootte = null;
     this.gehaald = false;
+    this.staOpBom = false;
   }
   
   beweeg() {
@@ -66,6 +88,15 @@ class Jos {
       return false;
     }
   }
+   staatOp(bommenLijst) {
+      for (var b = 0;b < bommenLijst.length;b++) {
+        if (bommenLijst[b].x == this.x && bommenLijst[b].y == this.y) {
+          this.staOpBom = true;
+        }
+      }
+      return this.staOpBom;
+    } 
+
   
   toon() {
     image(this.animatie[this.frameNummer],this.x,this.y,raster.celGrootte,raster.celGrootte);
@@ -95,6 +126,7 @@ class Vijand {
 
 function preload() {
   brug = loadImage("images/backgrounds/dame_op_brug_1800.jpg");
+  bomPlaatje = loadImage("images/sprites/bom_100px.png");
 }
 
 function setup() {
@@ -107,7 +139,9 @@ function setup() {
   raster = new Raster(12,18);
    
   raster.berekenCelGrootte();
-  
+  for (var b = 0;b < 60;b++) {
+    bommenArray.push(new Bom());
+  }
   eve = new Jos();
   eve.stapGrootte = 1*raster.celGrootte;
   for (var b = 0;b < 6;b++) {
@@ -127,21 +161,41 @@ function setup() {
 function draw() {
   background(brug);
   raster.teken();
-  eve.beweeg();
-  alice.beweeg();
-  bob.beweeg();
+  for (var b = 0;b < bommenArray.length;b++) {
+    bommenArray[b].toon();
+  }
+
+  if (eve.aanDeBeurt) {
+    eve.beweeg();
+  }
+  else {
+    alice.beweeg();
+    bob.beweeg();
+    eve.aanDeBeurt = true;
+  }
+
+  if (alice.x == bob.x && alice == bob.y) {
+    bob.beweeg();
+  }
+
   eve.toon();
+  eve.beweeg();
   alice.toon();
+  alice.beweeg();
   bob.toon();
-  
-  if (eve.wordtGeraakt(alice) || eve.wordtGeraakt(bob)) {
+  bob.beweeg();
+ 
+  if (eve.wordtGeraakt(alice) || eve.wordtGeraakt(bob) || eve.staatOp(bommenArray)) {
+    background('red');
+    fill('white');
+    text("Je hebt verloren!",30,300);
     noLoop();
   }
-  
+
   if (eve.gehaald) {
     background('green');
     fill('white');
     text("Je hebt gewonnen!",30,300);
     noLoop();
   }
-} 
+}
