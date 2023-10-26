@@ -139,7 +139,7 @@ function setup() {
   raster = new Raster(12,18);
    
   raster.berekenCelGrootte();
-  for (var b = 0;b < 60;b++) {
+  for (var b = 0;b < 5;b++) {
     bommenArray.push(new Bom());
   }
   eve = new Jos();
@@ -160,9 +160,13 @@ function setup() {
 
 function draw() {
   background(brug);
+  fill('orange');
+  rect(0,0,50,600);
+  rect(0,550,900,50);
   raster.teken();
   for (var b = 0;b < bommenArray.length;b++) {
     bommenArray[b].toon();
+    
   }
 
   if (eve.aanDeBeurt) {
@@ -197,5 +201,6 @@ function draw() {
     fill('white');
     text("Je hebt gewonnen!",30,300);
     noLoop();
+   
   }
 }
